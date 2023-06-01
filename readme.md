@@ -4,8 +4,6 @@
 
 - 8thWall AR Inworld experiment
 
-![Screenshot 2022-08-10 154837](https://user-images.githubusercontent.com/4311684/183917872-75d8d990-56f4-40fe-9443-a5e8174dd152.png)
-
 ## Setup
 
 - Frontend:
@@ -31,7 +29,7 @@ yarn build
 
 - Backend:
 
-1. Under `/server` folder run the following commands:
+1. Under the `/server` folder run the following commands:
 
 ```bash
 # Install dependencies (only the first time)
