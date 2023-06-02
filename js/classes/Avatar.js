@@ -9,7 +9,7 @@ class _Avatar {
   morphTargetMeshes = []
   url
 
-  init(url = '/models/rpm.glb') {
+  init(url = 'https://assets.inworld.ai/models/Default.glb') {
     const { scene } = XR8.Threejs.xrScene()
 
     this.url = url
@@ -80,7 +80,7 @@ class _Avatar {
       this.morphTargetMeshes.push(mesh)
     })
 
-    gltf.scene.scale.multiplyScalar(2)
+    // gltf.scene.scale.multiplyScalar(2)
   }
 
   updateBlendshapes(blendshapes) {

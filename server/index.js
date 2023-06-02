@@ -21,6 +21,8 @@ const credentials = {
   key: privateKey,
   cert: certificate,
   passphrase: process.env.PASSPHRASE,
+  requestCert: false,
+  rejectUnauthorized: false,
 }
 
 // create https server
@@ -75,17 +77,8 @@ app.use(cors())
 /**
  * Routes
  */
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.sendFile('index.html', { root: path.join(__dirname, 'public') })
-})
-
-app.get('/api/bonjour/:json?', (req, res) => {
-  const name = req.query.name || ''
-  const message = `Bonjour 👋 ${name}`
-
-  if (req.params.json) return res.json({ message })
-
-  return res.send(message)
 })
 
 app.get('/api/inworld/session-token', async (_, res) => {

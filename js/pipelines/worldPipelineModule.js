@@ -1,30 +1,21 @@
 // import { InworldClient } from '@inworld/nodejs-sdk'
 
 import Avatar from '../classes/Avatar'
+import Chat from '../classes/Chat'
+import InworldCharacter from '../classes/Inworld/InworldCharacter'
 import Lights from '../classes/Lights'
 import ParticlesSystem from '../classes/ParticlesSystem'
 
+// import InworldService from '../classes/InworldService'
+
 export const initWorldPipelineModule = () => {
-  const initInworldClient = () => {
-    console.log('initInworldClient...')
-
-    // try {
-    //   const client = new InworldClient().setApiKey({
-    //     key: import.meta.env.INWORLD_KEY,
-    //     secret: import.meta.env.INWORLD_SECRET,
-    //   })
-
-    //   console.log({ client })
-    // } catch (error) {
-    //   console.log({ error })
-    // }
-  }
   const init = () => {
     Lights.init()
+    Chat.init()
     Avatar.init()
     ParticlesSystem.init()
 
-    initInworldClient()
+    InworldCharacter.init()
 
     console.log('✨', 'World ready')
   }
