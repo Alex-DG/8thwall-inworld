@@ -1,3 +1,4 @@
+import Avatar from '../Avatar/Avatar'
 import InworldService from './InworldService'
 
 class _InworldCharacter {
@@ -8,22 +9,25 @@ class _InworldCharacter {
   }
 
   async onReady() {
-    console.log('->', 'Ready!')
+    console.log('🟢', 'Ready!')
   }
 
   onDisconnect() {
-    console.log('->', 'Disconnected!')
+    console.log('🔴', 'Disconnected!')
   }
 
   onPhoneme(phonemes) {
     // Pass phonemes to lip sync.
     console.log('->', 'onPhoneme', { phonemes })
+    Avatar.setPhonemes(phonemes)
   }
 
   onMessage(inworldPacket) {
     if (inworldPacket.isEmotion() && inworldPacket.packetId?.interactionId) {
-      this.setEmotionEvent(inworldPacket.emotions)
-      this.setEmotions(inworldPacket.emotions)
+      const emotions = inworldPacket.emotions
+
+      console.log('->', 'onMessage', { emotions })
+      Avatar.setEmotionEvent(emotions)
     }
   }
 

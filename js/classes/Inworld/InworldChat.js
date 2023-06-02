@@ -10,7 +10,7 @@ class _InworldChat {
 
     InworldCharacter.connection.recorder.stop()
     this.isRecording = false
-    connection.sendAudioSessionEnd()
+    InworldCharacter.connection.sendAudioSessionEnd()
   }
 
   async startRecording() {

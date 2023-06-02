@@ -1,5 +1,10 @@
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import * as THREE from 'three'
+import Animation from './Animation'
+
+const EYES_CLOSED = 'eyesClosed'
+const BLINK_SPEED = 1
+const BLINK_THRESH = 1000
 
 class _Avatar {
   loader = new GLTFLoader()
@@ -8,12 +13,32 @@ class _Avatar {
   root
   morphTargetMeshes = []
   url
+  skinnedMesh
 
-  init(url = 'https://assets.inworld.ai/models/Default.glb') {
+  //////////////////////////////////////////////////////////////////////////////////////////
+
+  setEmotionEvent(value) {
+    this.animations.setEmotionEvent(value)
+  }
+
+  setPhonemes(value) {
+    this.animations.setPhonemes(value)
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////
+
+  //'https://assets.inworld.ai/models/Default.glb'
+  init(
+    url = 'https://models.readyplayer.me/64796a2c786b05cdb7c244e8.glb?textureAtlas=1024&morphTargets=eyesClosed,Oculus%20Visemes'
+  ) {
     const { scene } = XR8.Threejs.xrScene()
 
     this.url = url
     this.scene = scene
+
+    this.elapsdTime = 0
+    this.skinnedMesh = null
+    this.eyesClosedIndex = -1
 
     this.loadModel(this.url)
   }
@@ -34,14 +59,6 @@ class _Avatar {
         this.gltf = gltf
         this.scene.add(gltf.scene)
         this.start(gltf)
-
-        // const box = new THREE.Mesh(
-        //   new THREE.BoxGeometry(0.5, 0.5, 0.5),
-        //   new THREE.MeshNormalMaterial()
-        // )
-        // box.frustumCulled = false
-        // this.scene.add(box)
-        // this.box = box
       },
 
       // Called while loading is progressing
@@ -80,8 +97,14 @@ class _Avatar {
       this.morphTargetMeshes.push(mesh)
     })
 
-    // gltf.scene.scale.multiplyScalar(2)
+    this.skinnedMesh = this.morphTargetMeshes[0]
+    const idx = this.skinnedMesh.morphTargetDictionary[EYES_CLOSED]
+    this.eyesClosedIndex = idx
+
+    this.animations = new Animation({ model: gltf.scene })
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////////
 
   updateBlendshapes(blendshapes) {
     for (const mesh of this.morphTargetMeshes) {
@@ -101,45 +124,31 @@ class _Avatar {
       }
     }
   }
+  updateEyesBlink(deltaTime) {
+    if (this.skinnedMesh) {
+      this.elapsdTime += deltaTime
 
-  /**
-   * Apply a position, rotation, scale matrix to current GLTF.scene
-   * @param matrix
-   * @param matrixRetargetOptions
-   * @returns
-   */
-  applyMatrix(matrix, matrixRetargetOptions) {
-    const { decompose = false, scale = 1 } = matrixRetargetOptions || {}
-    if (!this.gltf) {
-      return
-    }
-    // Three.js will update the object matrix when it render the page
-    // according the object position, scale, rotation.
-    // To manually set the object matrix, you have to set autoupdate to false.
-    matrix.scale(new THREE.Vector3(scale, scale, scale))
-    this.gltf.scene.matrixAutoUpdate = false
-    // Set new position and rotation from matrix
-    this.gltf.scene.matrix.copy(matrix)
+      let eyeClosedVal = THREE.MathUtils.clamp(
+        Math.sin(this.elapsdTime * BLINK_SPEED) * BLINK_THRESH -
+          BLINK_THRESH +
+          1,
+        0,
+        1
+      )
 
-    // this.box.matrixAutoUpdate = false
-    // this.box.matrix.copy(matrix)
-  }
-
-  /**
-   * Takes the root object in the avatar and offsets its position for retargetting.
-   * @param offset
-   * @param rotation
-   */
-  offsetRoot(offset, rotation) {
-    if (this.root) {
-      this.root.position.copy(offset)
-      if (rotation) {
-        let offsetQuat = new THREE.Quaternion().setFromEuler(
-          new THREE.Euler(rotation.x, rotation.y, rotation.z)
-        )
-        this.root.quaternion.copy(offsetQuat)
+      if (this.eyesClosedIndex !== -1) {
+        this.skinnedMesh.morphTargetInfluences[this.eyesClosedIndex] =
+          eyeClosedVal
       }
     }
+  }
+  updateAnimations(deltaTime) {
+    this.animations?.update(deltaTime)
+  }
+
+  update(deltaTime) {
+    this.updateEyesBlink(deltaTime)
+    this.updateAnimations(deltaTime)
   }
 }
 

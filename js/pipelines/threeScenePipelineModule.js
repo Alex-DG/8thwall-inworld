@@ -11,7 +11,7 @@ export const initThreeScenePipelineModule = () => {
 
     // Set the initial camera position relative to the scene we just laid out. This must be at a
     // height greater than y=0.
-    camera.position.set(0, 1.7, 0.7)
+    camera.position.set(0, 1.8, 0.8)
 
     // Sync the xr controller's 6DoF position and camera paremeters with our scene.
     XR8.XrController.updateCameraProjectionMatrix({
